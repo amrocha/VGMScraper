@@ -6,7 +6,7 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 from scrapy import signals
-from scrapy.exporters import JsonItemExporter
+import json
 import codecs
 
 
@@ -17,26 +17,14 @@ class VgmscraperPipeline(object):
 
 class JsonExportPipeline(object):
     def __init__(self):
-        self.files = {}
+        self.file = codecs.open('albums.json', 'w', encoding='utf-8-sig')
 
-    @classmethod
-    def from_crawler(cls, crawler):
-        pipeline = cls()
-        crawler.signals.connect(pipeline.spider_opened, signals.spider_opened)
-        crawler.signals.connect(pipeline.spider_closed, signals.spider_closed)
-        return pipeline
-
-    def spider_opened(self, spider):
-        file = codecs.open('%s_albums.json' % spider.name, 'w+b', encoding='utf-8')
-        self.files[spider] = file
-        self.exporter = JsonItemExporter(file)
-        self.exporter.start_exporting()
 
     def spider_closed(self, spider):
-        self.exporter.finish_exporting()
-        file = self.files.pop(spider)
-        file.close()
+        self.file.close()
 
-    def process_item(self, item, spider_):
+    def process_item(self, item, spider):
+        line = json.dumps(dict(item), ensure_ascii=False) + "\n"
+        self.file.write(line)
         self.exporter.export_item(item)
         return item
