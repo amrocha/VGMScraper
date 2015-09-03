@@ -6,4 +6,4 @@ To do:
 - File inputs for albums;
 - Let user specify file output;
 - Tag MP3 files correctly based on user input;
-- Fix encoding issues;
+- ~~Fix encoding issues;~~ Fixed
